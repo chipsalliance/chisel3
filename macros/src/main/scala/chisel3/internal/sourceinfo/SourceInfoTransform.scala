@@ -46,6 +46,19 @@ class InstTransform(val c: Context) extends SourceInfoTransformMacro {
   }
 }
 
+object TemplateTransform
+// Module instantiation transform
+class TemplateTransform(val c: Context) extends SourceInfoTransformMacro {
+  import c.universe._
+  def apply[T: c.WeakTypeTag](bc: c.Tree): c.Tree = {
+    q"$thisObj.do_apply($bc)($implicitSourceInfo, $implicitCompileOptions)"
+  }
+}
+
+//class InstanceHandle() extends StaticAnnotation {
+//  def macroTransform(annottees: Any*): InstanceHandle = macro ???
+//}
+
 // Workaround for https://github.com/sbt/sbt/issues/3966
 object MemTransform
 class MemTransform(val c: Context) extends SourceInfoTransformMacro {
@@ -119,6 +132,10 @@ class SourceInfoTransform(val c: Context) extends AutoSourceTransform {
 
   def noArg(): c.Tree = {
     q"$thisObj.$doFuncTerm($implicitSourceInfo, $implicitCompileOptions)"
+  }
+
+  def xmrArg(that: c.Tree, ctx: c.Tree): c.Tree = {
+    q"$thisObj.$doFuncTerm($that, $ctx)($implicitSourceInfo, $implicitCompileOptions)"
   }
 
   def thatArg(that: c.Tree): c.Tree = {

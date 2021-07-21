@@ -43,7 +43,6 @@ object Module extends SourceInfoDoc {
     Builder.clearPrefix()
     Builder.currentClock = None
     Builder.currentReset = None
-
     // Execute the module, this has the following side effects:
     //   - set currentModule
     //   - unset readyForModuleConstr
@@ -269,7 +268,7 @@ package experimental {
   /** Abstract base class for Modules, an instantiable organizational unit for RTL.
     */
   // TODO: seal this?
-  abstract class BaseModule extends HasId {
+  abstract class BaseModule extends HasId with IsInstantiable {
     _parent.foreach(_.addId(this))
 
     //
@@ -397,6 +396,7 @@ package experimental {
       * @note Should not be called until circuit elaboration is complete
       */
     final def toAbsoluteTarget: IsModule = {
+      //require(!isTemplate, "Cannot use toAbsoluteTarget on a template! Use other API I'm creating.")
       _parent match {
         case Some(parent) => parent.toAbsoluteTarget.instOf(this.instanceName, toTarget.module)
         case None => toTarget
